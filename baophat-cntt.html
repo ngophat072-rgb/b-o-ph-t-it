@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BảoPhát CNTT - Học Lập Trình</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --card: #151e2e;
+    --border: rgba(100,200,255,0.15);
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; }
+
+  /* TOPBAR */
+  #topbar {
+    background: rgba(10,14,26,0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+    position: sticky; top:0; z-index:100;
+    backdrop-filter: blur(12px);
+  }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon {
+    width:36px; height:36px; border-radius:8px;
+    background: linear-gradient(135deg,#00d4ff,#7c3aed);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:14px; font-weight:700; color:#fff;
+  }
+  .logo-text { font-weight:700; font-size:18px; }
+  .logo-text span { color:var(--accent); }
+  .author-tag {
+    font-size:11px; color:var(--muted);
+    background:var(--bg3); padding:3px 10px; border-radius:20px;
+    border:1px solid var(--border); font-family:var(--mono);
+  }
+  .author-tag b { color:var(--accent); }
+  .topbar-right { display:flex; gap:10px; align-items:center; }
+  .btn {
+    padding:8px 18px; border-radius:8px; border:none; cursor:pointer;
+    font-family:var(--sans); font-size:14px; font-weight:500; transition:all .2s;
+  }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-primary:hover { opacity:.9; transform:translateY(-1px); }
+  .btn-success { background:var(--accent3); color:#fff; }
+  .user-badge {
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg3); border:1px solid var(--border);
+    padding:6px 14px; border-radius:8px; font-size:14px;
+  }
+  .avatar {
+    width:28px; height:28px; border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700;
+  }
+
+  /* PAGES */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* HOME */
+  #home { padding:3rem 2rem; max-width:1200px; margin:0 auto; }
+  .hero {
+    text-align:center; padding:4rem 0 3rem;
+  }
+  .hero-tag {
+    display:inline-block; background:rgba(0,212,255,.1);
+    border:1px solid rgba(0,212,255,.3); color:var(--accent);
+    padding:6px 16px; border-radius:20px; font-size:13px; margin-bottom:1.5rem;
+    font-family:var(--mono);
+  }
+  .hero h1 {
+    font-size:clamp(2rem,5vw,3.5rem); font-weight:700; line-height:1.2;
+    margin-bottom:1rem;
+  }
+  .hero h1 span { color:var(--accent); }
+  .hero p { color:var(--muted); font-size:1.1rem; max-width:600px; margin:0 auto 2rem; }
+  .hero-stats {
+    display:flex; gap:2rem; justify-content:center; flex-wrap:wrap;
+    margin-bottom:3rem;
+  }
+  .stat { text-align:center; }
+  .stat-num { font-size:2rem; font-weight:700; color:var(--accent); font-family:var(--mono); }
+  .stat-label { font-size:12px; color:var(--muted); }
+
+  .section-title {
+    font-size:1.4rem; font-weight:700; margin-bottom:1.5rem;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* LANGUAGE GRID */
+  .lang-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:16px; margin-bottom:3rem;
+  }
+  .lang-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:1.5rem 1rem; text-align:center;
+    cursor:pointer; transition:all .25s; position:relative; overflow:hidden;
+  }
+  .lang-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background:var(--lc, var(--accent));
+  }
+  .lang-card:hover { border-color:var(--lc, var(--accent)); transform:translateY(-4px); background:var(--bg3); }
+  .lang-icon { font-size:2.5rem; margin-bottom:.75rem; }
+  .lang-name { font-weight:600; font-size:1rem; margin-bottom:.25rem; }
+  .lang-desc { font-size:12px; color:var(--muted); }
+
+  /* IT INFO CARDS */
+  .info-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; margin-bottom:3rem; }
+  .info-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:1.5rem; transition:border-color .2s;
+  }
+  .info-card:hover { border-color:rgba(0,212,255,.4); }
+  .info-card-icon { font-size:2rem; margin-bottom:1rem; }
+  .info-card h3 { font-size:1.05rem; font-weight:600; margin-bottom:.5rem; }
+  .info-card p { font-size:14px; color:var(--muted); line-height:1.7; }
+
+  /* CODE EDITOR PAGE */
+  #editor-page { padding:1.5rem 2rem; max-width:1200px; margin:0 auto; }
+  .editor-header {
+    display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;
+    flex-wrap:wrap;
+  }
+  .back-btn {
+    background:var(--bg3); border:1px solid var(--border); color:var(--muted);
+    padding:8px 14px; border-radius:8px; cursor:pointer; font-size:14px;
+    display:flex; align-items:center; gap:6px; transition:all .2s; font-family:var(--sans);
+  }
+  .back-btn:hover { color:var(--text); border-color:var(--accent); }
+  .lang-badge {
+    padding:6px 14px; border-radius:8px; font-family:var(--mono); font-size:14px;
+    font-weight:700; background:rgba(0,212,255,.1); color:var(--accent);
+    border:1px solid rgba(0,212,255,.3);
+  }
+  .editor-layout { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:768px) { .editor-layout { grid-template-columns:1fr; } }
+
+  .lesson-panel {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+  }
+  .panel-header {
+    padding:12px 16px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg3); font-size:14px; font-weight:600;
+  }
+  .dot { width:10px; height:10px; border-radius:50%; }
+  .lesson-content { padding:1.25rem; font-size:14px; line-height:1.8; color:var(--muted); }
+  .lesson-content h3 { color:var(--text); font-size:1rem; margin:.75rem 0 .4rem; }
+  .lesson-content code {
+    background:var(--bg3); color:var(--accent); padding:2px 6px;
+    border-radius:4px; font-family:var(--mono); font-size:12px;
+  }
+  .example-code {
+    background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    padding:1rem; font-family:var(--mono); font-size:13px;
+    color:#a8d0e8; margin:.75rem 0; overflow-x:auto; white-space:pre;
+    line-height:1.7;
+  }
+
+  .code-panel { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .code-textarea {
+    width:100%; background:var(--bg); color:#a8d0e8;
+    font-family:var(--mono); font-size:13px; padding:1rem;
+    border:none; outline:none; resize:vertical; min-height:260px;
+    line-height:1.8; tab-size:2;
+  }
+  .code-toolbar {
+    padding:10px 16px; border-top:1px solid var(--border);
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .task-box {
+    background:rgba(124,58,237,.1); border:1px solid rgba(124,58,237,.3);
+    border-radius:8px; padding:1rem 1.25rem; margin:1rem 0;
+  }
+  .task-box h4 { color:#a78bfa; font-size:14px; margin-bottom:.4rem; font-weight:600; }
+  .task-box p { font-size:13px; color:var(--muted); }
+
+  /* SCORE */
+  .score-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.8);
+    display:flex; align-items:center; justify-content:center;
+    z-index:200; backdrop-filter:blur(6px);
+  }
+  .score-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:2.5rem; text-align:center;
+    max-width:400px; width:90%;
+  }
+  .score-ring {
+    width:120px; height:120px; border-radius:50%;
+    background:conic-gradient(var(--accent) var(--p,0%), var(--bg3) 0%);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 1.5rem; position:relative;
+  }
+  .score-ring::before {
+    content:''; position:absolute; width:90px; height:90px;
+    border-radius:50%; background:var(--card);
+  }
+  .score-num { position:relative; z-index:1; font-family:var(--mono); font-size:1.8rem; font-weight:700; }
+  .score-title { font-size:1.3rem; font-weight:700; margin-bottom:.5rem; }
+  .score-msg { color:var(--muted); font-size:14px; margin-bottom:1.5rem; }
+  .score-btns { display:flex; gap:10px; justify-content:center; }
+
+  /* AUTH */
+  .auth-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.85);
+    display:flex; align-items:center; justify-content:center;
+    z-index:300; backdrop-filter:blur(8px);
+  }
+  .auth-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:2.5rem; width:380px; max-width:95vw;
+  }
+  .auth-box h2 { font-size:1.5rem; font-weight:700; margin-bottom:.5rem; }
+  .auth-box p { color:var(--muted); font-size:14px; margin-bottom:1.5rem; }
+  .field { margin-bottom:1rem; }
+  .field label { display:block; font-size:13px; color:var(--muted); margin-bottom:5px; }
+  .field input {
+    width:100%; background:var(--bg); border:1px solid var(--border);
+    color:var(--text); padding:10px 14px; border-radius:8px; font-size:14px;
+    font-family:var(--sans); outline:none; transition:border-color .2s;
+  }
+  .field input:focus { border-color:var(--accent); }
+  .auth-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
+  .auth-tab {
+    padding:10px 20px; font-size:14px; cursor:pointer; border:none;
+    background:none; color:var(--muted); font-family:var(--sans); transition:all .2s;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .auth-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .auth-close {
+    float:right; background:none; border:none; color:var(--muted);
+    font-size:20px; cursor:pointer; padding:0;
+  }
+  .auth-close:hover { color:var(--text); }
+  .error-msg { color:#f87171; font-size:13px; margin-top:-6px; margin-bottom:8px; }
+
+  /* PROGRESS */
+  .progress-bar {
+    height:4px; background:var(--bg3); border-radius:2px; margin:8px 0;
+  }
+  .progress-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .4s; }
+
+  /* Tabs for lessons */
+  .lessons-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
+  .lesson-tab {
+    padding:6px 14px; border-radius:20px; font-size:13px; cursor:pointer;
+    background:var(--bg3); border:1px solid var(--border); color:var(--muted);
+    transition:all .2s; font-family:var(--sans);
+  }
+  .lesson-tab.active { background:rgba(0,212,255,.1); border-color:var(--accent); color:var(--accent); }
+  .lesson-tab.done { background:rgba(16,185,129,.1); border-color:var(--accent3); color:var(--accent3); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo" onclick="goPage('home')" style="cursor:pointer">
+    <div class="logo-icon">BP</div>
+    <div class="logo-text"><span>BảoPhát</span> CNTT</div>
+  </div>
+  <div class="author-tag">Tác giả: <b>Bảo Phát</b></div>
+  <div class="topbar-right" id="topbar-right">
+    <button class="btn btn-ghost" onclick="openAuth('login')">Đăng Nhập</button>
+    <button class="btn btn-primary" onclick="openAuth('register')">Đăng Ký</button>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<div id="home" class="page active">
+  <div style="max-width:1200px;margin:0 auto;padding:2rem 2rem">
+    <div class="hero">
+      <div class="hero-tag">🎓 Nền tảng học lập trình miễn phí</div>
+      <h1>Học <span>Lập Trình</span><br>Từ Con Số 0</h1>
+      <p>Nền tảng học CNTT hiện đại với hướng dẫn từng bước, bài tập thực hành và chấm điểm tự động.</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Ngôn ngữ</div></div>
+        <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Bài học</div></div>
+        <div class="stat"><div class="stat-num">1000+</div><div class="stat-label">Học viên</div></div>
+      </div>
+    </div>
+
+    <div class="section-title">🌐 Chọn Ngôn Ngữ Lập Trình</div>
+    <div class="lang-grid">
+      <div class="lang-card" style="--lc:#f7df1e" onclick="startLearn('javascript')">
+        <div class="lang-icon">🟨</div>
+        <div class="lang-name">JavaScript</div>
+        <div class="lang-desc">Web • Frontend • Backend</div>
+      </div>
+      <div class="lang-card" style="--lc:#3776ab" onclick="startLearn('python')">
+        <div class="lang-icon">🐍</div>
+        <div class="lang-name">Python</div>
+        <div class="lang-desc">AI • Data • Automation</div>
+      </div>
+      <div class="lang-card" style="--lc:#e34f26" onclick="startLearn('html')">
+        <div class="lang-icon">🌐</div>
+        <div class="lang-name">HTML/CSS</div>
+        <div class="lang-desc">Web Design • Giao diện</div>
+      </div>
+      <div class="lang-card" style="--lc:#007396" onclick="startLearn('java')">
+        <div class="lang-icon">☕</div>
+        <div class="lang-name">Java</div>
+        <div class="lang-desc">OOP • Android • Backend</div>
+      </div>
+      <div class="lang-card" style="--lc:#00bcd4" onclick="startLearn('cpp')">
+        <div class="lang-icon">⚙️</div>
+        <div class="lang-name">C/C++</div>
+        <div class="lang-desc">Hệ thống • Hiệu năng</div>
+      </div>
+      <div class="lang-card" style="--lc:#178600" onclick="startLearn('csharp')">
+        <div class="lang-icon">🔷</div>
+        <div class="lang-name">C#</div>
+        <div class="lang-desc">Game • Desktop • .NET</div>
+      </div>
+      <div class="lang-card" style="--lc:#ff6384" onclick="startLearn('sql')">
+        <div class="lang-icon">🗄️</div>
+        <div class="lang-name">SQL</div>
+        <div class="lang-desc">Database • Dữ liệu</div>
+      </div>
+      <div class="lang-card" style="--lc:#e05d44" onclick="startLearn('php')">
+        <div class="lang-icon">🐘</div>
+        <div class="lang-name">PHP</div>
+        <div class="lang-desc">Web Server • WordPress</div>
+      </div>
+      <div class="lang-card" style="--lc:#ff7c00" onclick="startLearn('swift')">
+        <div class="lang-icon">🍎</div>
+        <div class="lang-name">Swift</div>
+        <div class="lang-desc">iOS • macOS • Apple</div>
+      </div>
+      <div class="lang-card" style="--lc:#7f52ff" onclick="startLearn('kotlin')">
+        <div class="lang-icon">📱</div>
+        <div class="lang-name">Kotlin</div>
+        <div class="lang-desc">Android • JVM Modern</div>
+      </div>
+    </div>
+
+    <div class="section-title">💡 Kiến Thức CNTT Cơ Bản</div>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-icon">🖥️</div>
+        <h3>Phần Cứng Máy Tính</h3>
+        <p>CPU là bộ não xử lý lệnh. RAM lưu dữ liệu tạm. Ổ cứng HDD/SSD lưu dài hạn. GPU xử lý đồ họa. Mainboard kết nối tất cả.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔗</div>
+        <h3>Mạng Máy Tính</h3>
+        <p>Mạng LAN kết nối thiết bị cục bộ. Internet là mạng toàn cầu. TCP/IP là giao thức truyền dữ liệu cơ bản. HTTP/HTTPS dành cho web.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🗄️</div>
+        <h3>Cơ Sở Dữ Liệu</h3>
+        <p>CSDL lưu trữ dữ liệu có cấu trúc. SQL (MySQL, PostgreSQL) dạng bảng. NoSQL (MongoDB) dạng tài liệu linh hoạt.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">☁️</div>
+        <h3>Điện Toán Đám Mây</h3>
+        <p>Cloud Computing cung cấp tài nguyên qua internet. AWS, Google Cloud, Azure là 3 nhà cung cấp lớn nhất thế giới hiện nay.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔐</div>
+        <h3>Bảo Mật Thông Tin</h3>
+        <p>Mã hóa bảo vệ dữ liệu. Firewall chặn truy cập trái phép. SSL/TLS bảo mật kết nối web. Cần backup dữ liệu thường xuyên.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🤖</div>
+        <h3>Trí Tuệ Nhân Tạo</h3>
+        <p>AI mô phỏng trí tuệ con người. Machine Learning tự học từ dữ liệu. Deep Learning dùng mạng nơ-ron nhiều lớp để phân tích.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR PAGE -->
+<div id="editor-page" class="page">
+  <div class="editor-header">
+    <button class="back-btn" onclick="goPage('home')">← Quay lại</button>
+    <div class="lang-badge" id="lang-label">JavaScript</div>
+    <div style="flex:1"></div>
+    <div id="score-display" style="font-family:var(--mono);font-size:14px;color:var(--accent);display:none">
+      🏆 Điểm: <span id="score-total">0</span>/100
+    </div>
+  </div>
+
+  <div class="lessons-nav" id="lessons-nav"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <div class="editor-layout" style="margin-top:1rem">
+    <div class="lesson-panel">
+      <div class="panel-header">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+        <span style="margin-left:6px" id="lesson-title">Bài học</span>
+      </div>
+      <div class="lesson-content" id="lesson-content">Chọn bài học...</div>
+    </div>
+    <div class="code-panel">
+      <div class="panel-header">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+        <span style="margin-left:6px">✏️ Viết code của bạn</span>
+      </div>
+      <textarea class="code-textarea" id="code-input" placeholder="// Gõ code vào đây...
+// Làm theo hướng dẫn bên trái và nhấn 'Chấm điểm'"></textarea>
+      <div class="code-toolbar">
+        <button class="btn btn-primary" onclick="gradeCode()">🎯 Chấm điểm</button>
+        <button class="btn btn-ghost" onclick="resetCode()">🔄 Xóa</button>
+        <button class="btn btn-ghost" onclick="showHint()">💡 Gợi ý</button>
+        <span style="font-size:12px;color:var(--muted);margin-left:auto" id="char-count">0 ký tự</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCORE OVERLAY -->
+<div class="score-overlay" id="score-overlay" style="display:none">
+  <div class="score-box">
+    <div class="score-ring" id="score-ring">
+      <div class="score-num" id="score-ring-num">0</div>
+    </div>
+    <div class="score-title" id="score-title">Kết quả</div>
+    <div class="score-msg" id="score-msg"></div>
+    <div class="score-btns">
+      <button class="btn btn-ghost" onclick="closeScore()">Xem lại</button>
+      <button class="btn btn-primary" onclick="nextLesson()">Bài tiếp →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay" style="display:none">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Đăng Nhập</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuth('register')">Đăng Ký</button>
+    </div>
+    <div id="auth-login">
+      <h2>Chào mừng trở lại!</h2>
+      <p>Đăng nhập để tiếp tục học tập của bạn</p>
+      <div class="field"><label>Tên đăng nhập</label><input id="li-user" type="text" placeholder="Nhập tên người dùng"></div>
+      <div class="field"><label>Email</label><input id="li-email" type="email" placeholder="example@email.com"></div>
+      <div class="field"><label>Mật khẩu</label><input id="li-pass" type="password" placeholder="••••••••"></div>
+      <div class="error-msg" id="li-error"></div>
+      <button class="btn btn-primary" style="width:100%;padding:12px" onclick="doLogin()">Đăng Nhập</button>
+    </div>
+    <div id="auth-register" style="display:none">
+      <h2>Tạo tài khoản mới</h2>
+      <p>Bắt đầu hành trình học lập trình của bạn</p>
+      <div class="field"><label>Họ và tên</label><input id="rg-name" type="text" placeholder="Nguyễn Văn A"></div>
+      <div class="field"><label>Tên đăng nhập</label><input id="rg-user" type="text" placeholder="username123"></div>
+      <div class="field"><label>Email</label><input id="rg-email" type="email" placeholder="example@email.com"></div>
+      <div class="field"><label>Mật khẩu</label><input id="rg-pass" type="password" placeholder="Ít nhất 6 ký tự"></div>
+      <div class="error-msg" id="rg-error"></div>
+      <button class="btn btn-primary" style="width:100%;padding:12px" onclick="doRegister()">Đăng Ký Ngay</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  javascript: {
+    color: '#f7df1e',
+    lessons: [
+      {
+        title: 'Bài 1: Biến và Kiểu dữ liệu',
+        theory: `<h3>📌 Biến trong JavaScript</h3>
+<p>Biến dùng để lưu trữ dữ liệu. Có 3 từ khóa khai báo:</p>
+<ul style="margin:.5rem 0 .5rem 1.2rem;line-height:2">
+<li><code>var</code> – khai báo cũ (phạm vi hàm)</li>
+<li><code>let</code> – biến có thể thay đổi</li>
+<li><code>const</code> – hằng số không đổi</li>
+</ul>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `let ten = "Bảo Phát";\nconst tuoi = 20;\nvar hocGioi = true;\n\nconsole.log(ten);\nconsole.log(tuoi);`,
+        task: 'Khai báo biến <code>tenBan</code> là tên của bạn, <code>namSinh</code> là năm sinh, và dùng <code>console.log</code> để in cả hai.',
+        keywords: ['let', 'const', 'var', 'console.log'],
+        minLen: 40
+      },
+      {
+        title: 'Bài 2: Hàm Function',
+        theory: `<h3>📌 Hàm (Function)</h3>
+<p>Hàm là khối code có thể tái sử dụng. Định nghĩa với từ khóa <code>function</code>.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `function chaoHoi(ten) {\n  return "Xin chào " + ten + "!";\n}\n\nconsole.log(chaoHoi("Bảo Phát"));`,
+        task: 'Viết hàm <code>tinhTong(a, b)</code> nhận 2 tham số và trả về tổng. Gọi hàm với 2 số bất kỳ.',
+        keywords: ['function', 'return', 'tinhTong'],
+        minLen: 50
+      },
+      {
+        title: 'Bài 3: Vòng lặp',
+        theory: `<h3>📌 Vòng lặp for</h3>
+<p>Vòng lặp thực thi một đoạn code nhiều lần theo điều kiện đặt trước.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `for (let i = 1; i <= 5; i++) {\n  console.log("Số: " + i);\n}`,
+        task: 'Dùng vòng lặp <code>for</code> để in ra các số từ 1 đến 10.',
+        keywords: ['for', 'let i', 'console.log'],
+        minLen: 40
+      }
+    ]
+  },
+  python: {
+    color: '#3776ab',
+    lessons: [
+      {
+        title: 'Bài 1: Print và Biến',
+        theory: `<h3>📌 Python cơ bản</h3>
+<p>Python dùng <code>print()</code> để in ra màn hình. Biến không cần khai báo kiểu dữ liệu.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `ten = "Bảo Phát"\ntuoi = 20\nprint(ten)\nprint("Tuổi:", tuoi)`,
+        task: 'Tạo biến <code>ten</code> và <code>tuoi</code>, sau đó dùng <code>print()</code> in ra.',
+        keywords: ['print', '='],
+        minLen: 30
+      },
+      {
+        title: 'Bài 2: Hàm def',
+        theory: `<h3>📌 Định nghĩa hàm với def</h3>
+<p>Python dùng từ khóa <code>def</code> để tạo hàm. Thụt lề 4 dấu cách bắt buộc.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `def chao(ten):\n    print("Xin chào", ten)\n\nchao("Bảo Phát")`,
+        task: 'Viết hàm <code>binhPhuong(n)</code> trả về bình phương của n. In kết quả với n=5.',
+        keywords: ['def', 'return', 'binhPhuong'],
+        minLen: 45
+      },
+      {
+        title: 'Bài 3: List và vòng lặp',
+        theory: `<h3>📌 List (Danh sách)</h3>
+<p>List lưu nhiều giá trị. Dùng <code>for...in</code> để duyệt từng phần tử.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `mon = ["Toán", "Lý", "CNTT"]\nfor m in mon:\n    print(m)`,
+        task: 'Tạo list <code>so</code> gồm 5 số. Dùng vòng lặp <code>for</code> in từng số.',
+        keywords: ['[', ']', 'for', 'in'],
+        minLen: 40
+      }
+    ]
+  },
+  html: {
+    color: '#e34f26',
+    lessons: [
+      {
+        title: 'Bài 1: Cấu trúc HTML',
+        theory: `<h3>📌 Thẻ HTML cơ bản</h3>
+<p>HTML dùng thẻ để tạo cấu trúc trang web. Mỗi thẻ mở <code>&lt;tag&gt;</code> cần thẻ đóng <code>&lt;/tag&gt;</code>.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `<h1>Tiêu đề lớn</h1>\n<h2>Tiêu đề nhỏ</h2>\n<p>Đây là đoạn văn bản</p>`,
+        task: 'Viết HTML có thẻ <code>&lt;h1&gt;</code> với tên bạn, thẻ <code>&lt;p&gt;</code> giới thiệu bản thân.',
+        keywords: ['<h1>', '</h1>', '<p>', '</p>'],
+        minLen: 30
+      },
+      {
+        title: 'Bài 2: Thẻ liên kết và hình ảnh',
+        theory: `<h3>📌 Liên kết và hình ảnh</h3>
+<p>Thẻ <code>&lt;a&gt;</code> tạo liên kết. Thẻ <code>&lt;img&gt;</code> chèn hình ảnh. Cả hai cần thuộc tính src/href.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `<a href="https://google.com">Truy cập Google</a>\n<img src="anh.jpg" alt="Mô tả ảnh">`,
+        task: 'Tạo thẻ <code>&lt;a&gt;</code> liên kết đến trang web yêu thích và thẻ <code>&lt;img&gt;</code> với alt text.',
+        keywords: ['<a', 'href', '<img', 'alt'],
+        minLen: 40
+      }
+    ]
+  },
+  java: {
+    color: '#007396',
+    lessons: [
+      {
+        title: 'Bài 1: Hello World',
+        theory: `<h3>📌 Cấu trúc Java cơ bản</h3>
+<p>Java cần class và method <code>main</code> để chạy. Dùng <code>System.out.println()</code> để in.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `public class Main {\n  public static void main(String[] args) {\n    System.out.println("Xin chào!");\n  }\n}`,
+        task: 'Viết chương trình Java đầy đủ in ra "Xin chào Bảo Phát!".',
+        keywords: ['public class', 'public static void main', 'System.out.println'],
+        minLen: 80
+      }
+    ]
+  },
+  cpp: {
+    color: '#00bcd4',
+    lessons: [
+      {
+        title: 'Bài 1: Cơ bản C++',
+        theory: `<h3>📌 C++ cơ bản</h3>
+<p>C++ dùng <code>#include</code> nạp thư viện. <code>cout</code> để in ra màn hình. <code>endl</code> xuống dòng.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Xin chào!" << endl;\n    return 0;\n}`,
+        task: 'Viết chương trình C++ in ra tên bạn và ngôn ngữ yêu thích.',
+        keywords: ['#include', 'int main', 'cout', 'return 0'],
+        minLen: 60
+      }
+    ]
+  },
+  csharp: {
+    color: '#178600',
+    lessons: [
+      {
+        title: 'Bài 1: Cơ bản C#',
+        theory: `<h3>📌 C# cơ bản</h3>
+<p>C# là ngôn ngữ của Microsoft. Dùng <code>Console.WriteLine()</code> để in. Cần namespace <code>System</code>.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Xin chào!");\n    }\n}`,
+        task: 'Viết chương trình C# in ra "BảoPhát CNTT" và năm học.',
+        keywords: ['using System', 'class', 'static void Main', 'Console.WriteLine'],
+        minLen: 70
+      }
+    ]
+  },
+  sql: {
+    color: '#ff6384',
+    lessons: [
+      {
+        title: 'Bài 1: SELECT cơ bản',
+        theory: `<h3>📌 Truy vấn SQL</h3>
+<p>SQL dùng để làm việc với cơ sở dữ liệu. <code>SELECT</code> để truy vấn dữ liệu từ bảng.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `SELECT * FROM hocsinh;\n\nSELECT ten, tuoi FROM hocsinh\nWHERE tuoi > 18;`,
+        task: 'Viết câu SQL lấy cột <code>ten</code> và <code>lop</code> từ bảng <code>sinhvien</code> với điều kiện <code>WHERE</code>.',
+        keywords: ['SELECT', 'FROM', 'WHERE'],
+        minLen: 30
+      }
+    ]
+  },
+  php: {
+    color: '#e05d44',
+    lessons: [
+      {
+        title: 'Bài 1: PHP cơ bản',
+        theory: `<h3>📌 PHP cơ bản</h3>
+<p>PHP chạy server-side. Code PHP nằm trong thẻ <code>&lt;?php ?&gt;</code>. Biến bắt đầu bằng ký tự <code>$</code>.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `<?php\n$ten = "Bảo Phát";\n$tuoi = 20;\necho "Tên: " . $ten;\necho "Tuổi: " . $tuoi;\n?>`,
+        task: 'Viết PHP khai báo biến <code>$name</code> và <code>$city</code>, dùng <code>echo</code> in ra.',
+        keywords: ['<?php', '$', 'echo'],
+        minLen: 40
+      }
+    ]
+  },
+  swift: {
+    color: '#ff7c00',
+    lessons: [
+      {
+        title: 'Bài 1: Swift cơ bản',
+        theory: `<h3>📌 Swift cơ bản</h3>
+<p>Swift là ngôn ngữ của Apple. Dùng <code>let</code> cho hằng, <code>var</code> cho biến. <code>print()</code> in ra màn hình.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `let ten = "Bảo Phát"\nvar tuoi = 20\nprint("Tên: \\(ten)")\nprint("Tuổi: \\(tuoi)")`,
+        task: 'Khai báo <code>let</code> và <code>var</code> trong Swift và dùng string interpolation để in.',
+        keywords: ['let', 'var', 'print'],
+        minLen: 30
+      }
+    ]
+  },
+  kotlin: {
+    color: '#7f52ff',
+    lessons: [
+      {
+        title: 'Bài 1: Kotlin cơ bản',
+        theory: `<h3>📌 Kotlin cơ bản</h3>
+<p>Kotlin là ngôn ngữ chính cho Android. Dùng <code>val</code> và <code>var</code>. <code>println()</code> in ra console.</p>
+<h3>📋 Ví dụ mẫu</h3>`,
+        example: `val ten = "Bảo Phát"\nvar tuoi = 20\nprintln("Tên: $ten")\nprintln("Tuổi: $tuoi")`,
+        task: 'Viết Kotlin khai báo <code>val</code> và <code>var</code>, dùng string template <code>$</code> để in.',
+        keywords: ['val', 'var', 'println'],
+        minLen: 30
+      }
+    ]
+  }
+};
+
+let currentLang = '';
+let currentLesson = 0;
+let lessonScores = [];
+let currentUser = null;
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startLearn(lang) {
+  currentLang = lang;
+  currentLesson = 0;
+  lessonScores = [];
+  const d = DATA[lang];
+  document.getElementById('lang-label').textContent = lang.toUpperCase();
+  renderLessonTabs();
+  loadLesson(0);
+  goPage('editor-page');
+  document.getElementById('score-display').style.display = 'none';
+}
+
+function renderLessonTabs() {
+  const d = DATA[currentLang];
+  const nav = document.getElementById('lessons-nav');
+  nav.innerHTML = d.lessons.map((l, i) => 
+    `<button class="lesson-tab ${i===0?'active':''}" id="ltab-${i}" onclick="loadLesson(${i})">${l.title.split(':')[0]}</button>`
+  ).join('');
+}
+
+function loadLesson(idx) {
+  currentLesson = idx;
+  const d = DATA[currentLang];
+  const l = d.lessons[idx];
+  document.querySelectorAll('.lesson-tab').forEach((t,i) => {
+    t.classList.toggle('active', i===idx);
+  });
+  document.getElementById('lesson-title').textContent = l.title;
+  document.getElementById('lesson-content').innerHTML = 
+    l.theory +
+    `<div class="example-code">${l.example}</div>` +
+    `<div class="task-box"><h4>🎯 Nhiệm vụ của bạn</h4><p>${l.task}</p></div>`;
+  document.getElementById('code-input').value = '';
+  document.getElementById('char-count').textContent = '0 ký tự';
+  updateProgress();
+}
+
+document.getElementById('code-input').addEventListener('input', function() {
+  document.getElementById('char-count').textContent = this.value.length + ' ký tự';
+});
+
+function updateProgress() {
+  const d = DATA[currentLang];
+  const pct = (currentLesson / d.lessons.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function gradeCode() {
+  const code = document.getElementById('code-input').value.trim();
+  const l = DATA[currentLang].lessons[currentLesson];
+  
+  if (code.length < 10) {
+    alert('Bạn chưa nhập code! Hãy thử viết theo hướng dẫn.');
+    return;
+  }
+
+  let score = 0;
+  let hits = 0;
+  const codeLower = code.toLowerCase();
+  
+  l.keywords.forEach(kw => {
+    if (code.includes(kw) || codeLower.includes(kw.toLowerCase())) hits++;
+  });
+  
+  score += Math.round((hits / l.keywords.length) * 60);
+  if (code.length >= l.minLen) score += 25;
+  else score += Math.round((code.length / l.minLen) * 25);
+  
+  const lines = code.split('\n').filter(s => s.trim()).length;
+  if (lines >= 3) score += 15;
+  else score += lines * 5;
+  
+  score = Math.min(100, score);
+  lessonScores[currentLesson] = score;
+  
+  document.getElementById('ltab-' + currentLesson).classList.add('done');
+  
+  const totalScore = Math.round(lessonScores.reduce((a,b)=>a+(b||0),0) / DATA[currentLang].lessons.length);
+  document.getElementById('score-total').textContent = totalScore;
+  document.getElementById('score-display').style.display = 'block';
+
+  const ring = document.getElementById('score-ring');
+  ring.style.setProperty('--p', (score * 3.6) + 'deg');
+  document.getElementById('score-ring-num').textContent = score;
+  document.getElementById('score-title').textContent = 
+    score >= 80 ? '🎉 Xuất Sắc!' : score >= 60 ? '👍 Khá Tốt!' : '💪 Cần Cố Gắng!';
+  document.getElementById('score-msg').textContent = 
+    score >= 80 ? 'Bạn đã nắm vững bài này! Tiếp tục bài tiếp theo nhé.' :
+    score >= 60 ? 'Bạn đã hiểu cơ bản. Thực hành thêm để thành thục hơn.' :
+    'Hãy đọc kỹ hướng dẫn và thử lại. Bạn có thể làm được!';
+
+  document.getElementById('score-overlay').style.display = 'flex';
+  setTimeout(() => {
+    ring.style.background = `conic-gradient(var(--accent) ${score * 3.6}deg, var(--bg3) 0%)`;
+  }, 100);
+}
+
+function closeScore() {
+  document.getElementById('score-overlay').style.display = 'none';
+}
+
+function nextLesson() {
+  document.getElementById('score-overlay').style.display = 'none';
+  const lessons = DATA[currentLang].lessons;
+  if (currentLesson < lessons.length - 1) {
+    loadLesson(currentLesson + 1);
+    updateProgress();
+  } else {
+    alert('🎓 Bạn đã hoàn thành tất cả bài học của ' + currentLang.toUpperCase() + '! Hãy thử ngôn ngữ khác!');
+    goPage('home');
+  }
+}
+
+function resetCode() {
+  document.getElementById('code-input').value = '';
+  document.getElementById('char-count').textContent = '0 ký tự';
+}
+
+function showHint() {
+  const l = DATA[currentLang].lessons[currentLesson];
+  alert('💡 Gợi ý: Bạn cần sử dụng các từ khóa: ' + l.keywords.join(', '));
+}
+
+function openAuth(tab) {
+  document.getElementById('auth-overlay').style.display = 'flex';
+  switchAuth(tab);
+}
+
+function closeAuth() {
+  document.getElementById('auth-overlay').style.display = 'none';
+}
+
+function switchAuth(tab) {
+  document.getElementById('auth-login').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+}
+
+function doLogin() {
+  const user = document.getElementById('li-user').value.trim();
+  const email = document.getElementById('li-email').value.trim();
+  const pass = document.getElementById('li-pass').value;
+  const err = document.getElementById('li-error');
+  
+  if (!user || !email || !pass) { err.textContent = 'Vui lòng điền đầy đủ thông tin!'; return; }
+  if (!email.includes('@')) { err.textContent = 'Email không hợp lệ!'; return; }
+  if (pass.length < 6) { err.textContent = 'Mật khẩu ít nhất 6 ký tự!'; return; }
+  
+  currentUser = { name: user, email: email };
+  err.textContent = '';
+  closeAuth();
+  updateUserUI();
+}
+
+function doRegister() {
+  const name = document.getElementById('rg-name').value.trim();
+  const user = document.getElementById('rg-user').value.trim();
+  const email = document.getElementById('rg-email').value.trim();
+  const pass = document.getElementById('rg-pass').value;
+  const err = document.getElementById('rg-error');
+  
+  if (!name || !user || !email || !pass) { err.textContent = 'Vui lòng điền đầy đủ thông tin!'; return; }
+  if (!email.includes('@')) { err.textContent = 'Email không hợp lệ!'; return; }
+  if (pass.length < 6) { err.textContent = 'Mật khẩu ít nhất 6 ký tự!'; return; }
+  
+  currentUser = { name: name, username: user, email: email };
+  err.textContent = '';
+  closeAuth();
+  updateUserUI();
+  alert('🎉 Đăng ký thành công! Chào mừng ' + name + ' đến với BảoPhát CNTT!');
+}
+
+function updateUserUI() {
+  if (!currentUser) return;
+  const initials = currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('topbar-right').innerHTML = `
+    <div class="user-badge">
+      <div class="avatar">${initials}</div>
+      <span>${currentUser.name}</span>
+    </div>
+    <button class="btn btn-ghost" onclick="logout()">Đăng xuất</button>
+  `;
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('topbar-right').innerHTML = `
+    <button class="btn btn-ghost" onclick="openAuth('login')">Đăng Nhập</button>
+    <button class="btn btn-primary" onclick="openAuth('register')">Đăng Ký</button>
+  `;
+}
+
+document.getElementById('auth-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAuth();
+});
+document.getElementById('score-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeScore();
+});
+</script>
+</body>
+</html>
